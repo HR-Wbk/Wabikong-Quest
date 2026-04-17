@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wabikong Quest</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@400;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--y:#F5C800;--bk:#1a1a1a;--bk2:#222;--bk3:#2e2e2e;--rd:#ff4444;--gr:#00cc66;--wh:#fffff0;--mt:#888866;--bd:#3a3a1a}
+body{background:var(--bk);font-family:'Rajdhani',sans-serif;color:var(--wh);min-height:100vh}
+.screen{display:none;animation:fi 0.4s ease}.screen.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes ticker{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 8px var(--y)}50%{box-shadow:0 0 20px var(--y)}}
+.hdr{background:var(--y);border-bottom:3px solid var(--bk);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Press Start 2P',monospace;font-size:15px;color:var(--bk);letter-spacing:1px}
+.sub{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--bk);opacity:0.6;margin-top:3px}
+.live{background:var(--bk);color:var(--y);font-family:'Press Start 2P',monospace;font-size:7px;padding:4px 8px;border-radius:2px;animation:blink 1s infinite}
+.clk{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--bk);opacity:0.7}
+.nav{display:flex;gap:4px;padding:8px 20px;background:var(--bk2);border-bottom:2px solid var(--y);overflow-x:auto}
+.nb{font-family:'Press Start 2P',monospace;font-size:7px;padding:8px 10px;background:var(--bk3);border:1px solid var(--bd);color:var(--mt);cursor:pointer;border-radius:2px;white-space:nowrap;transition:all 0.2s}
+.nb.active,.nb:hover{background:var(--y);color:var(--bk);border-color:var(--y)}
+.tkr{background:var(--y);border-top:2px solid var(--bk);border-bottom:2px solid var(--bk);padding:6px 0;overflow:hidden;white-space:nowrap}
+.tki{display:inline-block;animation:ticker 30s linear infinite;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--bk)}
+.cnt{padding:16px 20px;max-width:1200px;margin:0 auto}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--bk2);border:1px solid var(--bd);border-radius:4px;padding:14px}
+.cy{border:2px solid var(--y);box-shadow:0 0 10px rgba(245,200,0,0.2)}
+.cr{border:1px solid var(--rd)}
+.ct{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--mt);margin-bottom:10px}
+.sb{font-family:'Press Start 2P',monospace;font-size:22px;color:var(--y);line-height:1}
+.sr{color:var(--rd)}.sl{font-size:13px;color:var(--mt);margin-top:6px}
+.pb{background:var(--bk3);border:1px solid var(--bd);border-radius:2px;height:10px;overflow:hidden;margin:6px 0}
+.pf{height:100%;border-radius:2px;transition:width 1.2s ease}
+.fy{background:var(--y)}.fr{background:var(--rd)}.fg{background:var(--gr)}
+.st{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--y);margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+.st::after{content:'';flex:1;height:1px;background:var(--bd)}
+.hc{background:var(--bk3);border:1px solid var(--bd);border-radius:4px;padding:10px;margin:6px 0;display:flex;align-items:center;gap:10px;transition:all 0.2s}
+.hc:hover{border-color:var(--y);transform:translateX(3px)}
+.hc.top{border:2px solid var(--y);background:#2a2a00}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;font-size:9px;flex-shrink:0;border:2px solid var(--y)}
+.avy{background:#3a3a00;color:var(--y)}.avd{background:#2a2a2a;color:#aaa}.avr{background:#3a0000;color:var(--rd)}
+.hi{flex:1}.hn{font-size:15px;font-weight:600}.hcl{font-size:11px;color:var(--mt)}.hs{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--y);text-align:right}
+.bdg{display:inline-block;font-family:'Press Start 2P',monospace;font-size:6px;padding:2px 5px;border-radius:2px;margin-left:5px}
+.by{background:rgba(245,200,0,0.15);color:var(--y);border:1px solid var(--y)}
+.br{background:rgba(255,68,68,0.15);color:var(--rd);border:1px solid var(--rd)}
+.dc{background:#1a0000;border:1px solid var(--rd);border-radius:4px;padding:10px;margin:6px 0}
+.dc:hover{animation:shake 0.4s ease}
+.dn{font-size:15px;font-weight:600;color:var(--rd)}
+.dt{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--rd);margin-bottom:3px;opacity:0.8}
+.dlc{background:var(--bk3);border-radius:4px;padding:10px;margin:6px 0;display:flex;align-items:center;gap:10px;border:1px solid var(--bd)}
+.dd{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ddr{background:var(--rd);box-shadow:0 0 6px var(--rd)}
+.ddy{background:var(--y);box-shadow:0 0 6px var(--y)}
+.ddg{background:#555533}
+.qb{background:#1a1a00;border-left:3px solid var(--y);padding:14px 16px;border-radius:0 4px 4px 0;margin:10px 0}
+.qt{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--y);line-height:1.9}
+.ls{text-align:center;padding:30px}
+.lt{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--y);animation:blink 1s infinite}
+.crown{font-size:18px;animation:float 2s ease infinite}
+.rbtn{font-family:'Press Start 2P',monospace;font-size:7px;background:var(--bk3);border:1px solid var(--y);color:var(--y);padding:6px 10px;cursor:pointer;border-radius:2px}
+.rbtn:hover{background:var(--y);color:var(--bk)}
+@media(max-width:600px){.g2,.g4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="logo">WABIKONG QUEST</div>
+    <div class="sub">SEASON 1 — APRIL 2026</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="clk" id="clk"></div>
+    <button class="rbtn" onclick="loadData()">&#8635; SYNC</button>
+    <div class="live">LIVE</div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nb active" onclick="showScreen('kingdom',this)">THE KINGDOM</button>
+  <button class="nb" onclick="showScreen('heroes',this)">HEROES</button>
+  <button class="nb" onclick="showScreen('dungeon',this)">THE DUNGEON</button>
+  <button class="nb" onclick="showScreen('bossfight',this)">BOSS FIGHT</button>
+  <button class="nb" onclick="showScreen('wisdom',this)">WIZARD SAYS</button>
+</div>
+
+<div class="tkr"><span class="tki" id="tkr">LOADING WABIKONG QUEST DATA...</span></div>
+
+<div class="cnt">
+
+<div id="screen-kingdom" class="screen active">
+  <div id="kl" class="ls">
+    <div class="lt">CONNECTING TO GOOGLE SHEET...</div>
+    <div style="font-size:12px;color:var(--mt);margin-top:10px">Fetching live data...</div>
+  </div>
+  <div id="kc" style="display:none">
+    <div class="g4" style="margin-bottom:12px">
+      <div class="card cy"><div class="ct">KINGDOM HEALTH</div><div class="sb" id="kh">0%</div><div class="pb"><div class="pf fy" id="khb" style="width:0%"></div></div><div class="sl">Tasks completed</div></div>
+      <div class="card"><div class="ct">QUESTS DONE</div><div class="sb" id="kd">0</div><div class="sl" id="kdl">of 0 total</div></div>
+      <div class="card cr"><div class="ct">DANGER ZONE</div><div class="sb sr" id="ko">0</div><div class="sl">Overdue tasks</div></div>
+      <div class="card"><div class="ct">DAYS LEFT</div><div class="sb" id="kday" style="color:var(--y)">-</div><div class="sl">Until month end</div></div>
+    </div>
+    <div class="g2">
+      <div class="card"><div class="ct">STATUS BREAKDOWN</div><div id="ksb"></div></div>
+      <div class="card"><div class="ct">STAFF OVERVIEW</div><div id="kso"></div></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-heroes" class="screen">
+  <div class="st">WALL OF FAME — TOP QUESTERS</div>
+  <div id="hl" class="ls"><div class="lt">LOADING HEROES...</div></div>
+  <div id="hlist" style="display:none"></div>
+</div>
+
+<div id="screen-dungeon" class="screen">
+  <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:var(--rd);text-align:center;margin:10px 0">&#9760; HEROES TRAPPED BY DEADLINES &#9760;</div>
+  <div id="dl" class="ls"><div class="lt">SCANNING FOR SLACKERS...</div></div>
+  <div id="dlist" style="display:none"></div>
+</div>
+
+<div id="screen-bossfight" class="screen">
+  <div style="font-family:'Press Start 2P',monospace;font-size:9px;color:var(--y);text-align:center;margin:10px 0;animation:blink 1s infinite">&#9889; BOSS FIGHT INCOMING &#9889;</div>
+  <div id="bl" class="ls"><div class="lt">SCANNING DEADLINES...</div></div>
+  <div id="blist" style="display:none"></div>
+</div>
+
+<div id="screen-wisdom" class="screen">
+  <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:var(--y);text-align:center;margin:10px 0">WIZARD PUAH SPEAKS</div>
+  <div class="qb"><div class="qt" id="qt"></div><div style="font-size:11px;color:var(--mt);margin-top:8px">&#8212; Ancient HR Proverb</div></div>
+  <div style="text-align:center;margin-top:16px">
+    <button onclick="nq()" style="font-family:'Press Start 2P',monospace;font-size:8px;background:var(--y);border:none;color:var(--bk);padding:10px 16px;cursor:pointer;border-radius:2px">NEXT WISDOM &#9658;</button>
+  </div>
+  <div class="st" style="margin-top:20px">ALL PROVERBS</div>
+  <div id="aq"></div>
+</div>
+
+</div>
+
+<script>
+var SHEET_ID='15Vd7GMhZezuqSfkSUEfTg-ckbXC1HGeXXE2-VLKHU4A';
+var API_KEY='AIzaSyDNDf8xFTGg0WVmwoCt3R3z8rR8pKyR_IA';
+var BASE='https://sheets.googleapis.com/v4/spreadsheets/';
+var staffData=[];
+var deadlineData=[];
+
+var quotes=[
+  "Your tasks won't complete themselves lah.",
+  "Deadline approaching. Panic responsibly.",
+  "The WiFi is fast. Why aren't you?",
+  "Someone is watching your overdue tasks. It is everyone.",
+  "Submit your claims or explain to payroll yourself.",
+  "Every overdue task is a boss you refused to fight.",
+  "Your future self is not happy with you right now.",
+  "Not updating the sheet is also a task. An overdue one.",
+  "The dungeon has no WiFi. Complete your tasks.",
+  "HR sees all. HR knows all. HR is HR.",
+  "Completed = hero. Overdue = dungeon. Choose wisely.",
+  "Wabikong did not come this far for you to procrastinate."
+];
+var qi=0;
+function nq(){qi=(qi+1)%quotes.length;document.getElementById('qt').textContent=quotes[qi];}
+document.getElementById('qt').textContent=quotes[0];
+var aqEl=document.getElementById('aq');
+quotes.forEach(function(q){
+  var d=document.createElement('div');
+  d.className='qb';d.style.marginBottom='8px';
+  d.innerHTML='<div class="qt" style="font-size:8px">'+q+'</div>';
+  aqEl.appendChild(d);
+});
+
+function showScreen(n,btn){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('screen-'+n).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+
+function updateClock(){
+  var now=new Date();
+  document.getElementById('clk').textContent=
+    now.getHours().toString().padStart(2,'0')+':'+
+    now.getMinutes().toString().padStart(2,'0')+':'+
+    now.getSeconds().toString().padStart(2,'0');
+}
+setInterval(updateClock,1000);
+updateClock();
+
+var daysLeft=Math.ceil((new Date('2026-04-30')-new Date())/(1000*60*60*24));
+document.getElementById('kday').textContent=Math.max(0,daysLeft);
+
+function parseSheet(data){
+  if(!data.values||data.values.length<2)return[];
+  var headers=data.values[0];
+  var rows=[];
+  for(var i=1;i<data.values.length;i++){
+    var row=data.values[i];
+    if(!row||!row[0]||!row[0].trim())continue;
+    var obj={};
+    headers.forEach(function(h,j){obj[h]=row[j]||'';});
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function showError(msg){
+  ['kl','hl','dl','bl'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.innerHTML='<div class="lt" style="color:var(--rd);font-size:8px;animation:none">'+msg+'</div><div style="font-size:12px;color:var(--mt);margin-top:12px">Check internet connection and Google Sheet permissions.</div>';
+  });
+}
+
+async function fetchRange(range){
+  var url=BASE+SHEET_ID+'/values/'+encodeURIComponent(range)+'?key='+API_KEY;
+  var r=await fetch(url);
+  if(!r.ok)throw new Error('Fetch failed: '+r.status);
+  return await r.json();
+}
+
+async function loadData(){
+  try{
+    var s1=await fetchRange('Staff!A:E');
+    staffData=parseSheet(s1).filter(function(r){return r.Name&&r.Name!=='Name';});
+
+    try{
+      var s2=await fetchRange('Deadlines!A:D');
+      deadlineData=parseSheet(s2).filter(function(r){return r.Task&&r.Task!=='Task';});
+    }catch(e){deadlineData=[];}
+
+    if(staffData.length===0){
+      showError('NO STAFF DATA — ADD NAMES TO GOOGLE SHEET');
+      return;
+    }
+    renderKingdom();
+    renderHeroes();
+    renderDungeon();
+    renderBossFight();
+    updateTicker();
+  }catch(e){
+    showError('CONNECTION ERROR — '+e.message);
+    console.error(e);
+  }
+}
+
+function renderKingdom(){
+  var t=0,d=0,o=0,og=0;
+  staffData.forEach(function(r){
+    t+=parseInt(r.Total)||0;
+    d+=parseInt(r.Completed)||0;
+    o+=parseInt(r.Overdue)||0;
+    og+=parseInt(r.Ongoing)||0;
+  });
+  var pct=t>0?Math.round(d/t*100):0;
+  document.getElementById('kh').textContent=pct+'%';
+  document.getElementById('khb').style.width=pct+'%';
+  document.getElementById('kd').textContent=d;
+  document.getElementById('kdl').textContent='of '+t+' total';
+  document.getElementById('ko').textContent=o;
+  var sb=document.getElementById('ksb');
+  sb.innerHTML='';
+  [{l:'Completed',c:d,cl:'fy'},{l:'Ongoing',c:og,cl:'fg'},{l:'Overdue',c:o,cl:'fr'}].forEach(function(s){
+    var p=t>0?Math.round(s.c/t*100):0;
+    sb.innerHTML+='<div style="margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:2px">'+
+      '<span style="font-size:13px">'+s.l+'</span>'+
+      '<span style="font-family:\'Press Start 2P\',monospace;font-size:8px;color:var(--y)">'+s.c+' ('+p+'%)</span></div>'+
+      '<div class="pb"><div class="pf '+s.cl+'" style="width:'+p+'%"></div></div></div>';
+  });
+  var so=document.getElementById('kso');
+  so.innerHTML='';
+  staffData.forEach(function(r){
+    var tot=parseInt(r.Total)||0;
+    var don=parseInt(r.Completed)||0;
+    var p=tot>0?Math.round(don/tot*100):0;
+    so.innerHTML+='<div style="margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:2px">'+
+      '<span style="font-size:13px">'+r.Name+'</span>'+
+      '<span style="font-family:\'Press Start 2P\',monospace;font-size:8px;color:var(--y)">'+p+'%</span></div>'+
+      '<div class="pb"><div class="pf fy" style="width:'+p+'%"></div></div></div>';
+  });
+  document.getElementById('kl').style.display='none';
+  document.getElementById('kc').style.display='block';
+}
+
+var classes=['Warrior','Mage','Bard','Tank','Apprentice','Ranger','Rogue','Healer'];
+var icons=['&#9876;','&#129497;','&#11088;','&#128737;','&#128423;','&#127993;','&#128303;','&#128138;'];
+var dtitles=['PROCRASTINATOR OF THE WEEK','CURRENTLY IN DENIAL','PROFESSIONALLY MISSING','TASK HOARDER SUPREME','DEADLINE? WHAT DEADLINE?'];
+var dquotes=['"Last seen attempting to look busy"','"Tasks ageing like fine wine"','"WiFi is fast. They are not."','"Buffering since last week"','"In a meeting with their own excuses"'];
+
+function renderHeroes(){
+  var sorted=staffData.slice().sort(function(a,b){return(parseInt(b.Completed)||0)-(parseInt(a.Completed)||0);});
+  var hl=document.getElementById('hlist');
+  hl.innerHTML='';
+  sorted.forEach(function(r,i){
+    var don=parseInt(r.Completed)||0;
+    var tot=parseInt(r.Total)||0;
+    var ovr=parseInt(r.Overdue)||0;
+    var pct=tot>0?Math.round(don/tot*100):0;
+    var ini=r.Name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2);
+    var isTop=i===0;
+    var c=document.createElement('div');
+    c.className='hc'+(isTop?' top':'');
+    c.innerHTML=(isTop?'<div class="crown">&#128081;</div>':
+      '<div style="font-family:\'Press Start 2P\',monospace;font-size:12px;color:var(--mt);min-width:24px;text-align:center">'+(i+1)+'</div>')+
+      '<div class="av '+(isTop?'avy':'avd')+'">'+ini+'</div>'+
+      '<div class="hi">'+
+        '<div class="hn">'+r.Name+(isTop?'<span class="bdg by">MVP</span>':'')+(ovr>0?'<span class="bdg br">'+ovr+' OVERDUE</span>':'')+'</div>'+
+        '<div class="hcl">'+icons[i%icons.length]+' '+classes[i%classes.length]+'</div>'+
+        '<div class="pb" style="margin:4px 0"><div class="pf fy" style="width:'+pct+'%"></div></div>'+
+      '</div>'+
+      '<div class="hs">'+don+' DONE<br><span style="font-size:8px;color:var(--mt)">'+pct+'%</span></div>';
+    hl.appendChild(c);
+  });
+  document.getElementById('hl').style.display='none';
+  hl.style.display='block';
+}
+
+function renderDungeon(){
+  var ovStaff=staffData.filter(function(r){return(parseInt(r.Overdue)||0)>0;})
+    .sort(function(a,b){return(parseInt(b.Overdue)||0)-(parseInt(a.Overdue)||0);});
+  var dl=document.getElementById('dlist');
+  dl.innerHTML='';
+  if(ovStaff.length===0){
+    dl.innerHTML='<div style="text-align:center;padding:30px">'+
+      '<div style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:var(--y)">DUNGEON IS EMPTY!</div>'+
+      '<div style="font-size:14px;color:var(--mt);margin-top:10px">All heroes on track. The realm is safe.</div></div>';
+    dl.style.display='block';
+    document.getElementById('dl').style.display='none';
+    return;
+  }
+  ovStaff.forEach(function(r,i){
+    var ovr=parseInt(r.Overdue)||0;
+    var ini=r.Name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2);
+    var c=document.createElement('div');
+    c.className='dc';
+    c.innerHTML='<div style="display:flex;align-items:center;gap:10px">'+
+      '<div class="av avr">'+ini+'</div>'+
+      '<div style="flex:1">'+
+        '<div class="dt">'+dtitles[i%dtitles.length]+'</div>'+
+        '<div class="dn">'+r.Name+' <span class="bdg br">'+ovr+' OVERDUE</span></div>'+
+        '<div style="font-size:12px;color:var(--mt)">'+dquotes[i%dquotes.length]+'</div>'+
+      '</div>'+
+      '<div style="text-align:right">'+
+        '<div style="font-family:\'Press Start 2P\',monospace;font-size:14px;color:var(--rd)">'+ovr+'</div>'+
+        '<div style="font-size:11px;color:var(--mt)">tasks</div>'+
+      '</div></div>';
+    dl.appendChild(c);
+  });
+  document.getElementById('dl').style.display='none';
+  dl.style.display='block';
+}
+
+function renderBossFight(){
+  var now=new Date();
+  var bl=document.getElementById('blist');
+  bl.innerHTML='';
+  if(deadlineData.length===0){
+    bl.innerHTML='<div style="text-align:center;padding:30px">'+
+      '<div style="font-family:\'Press Start 2P\',monospace;font-size:9px;color:var(--y)">NO DEADLINES FOUND</div>'+
+      '<div style="font-size:13px;color:var(--mt);margin-top:10px">Add deadlines to the Deadlines tab in Google Sheet</div></div>';
+    bl.style.display='block';
+    document.getElementById('bl').style.display='none';
+    return;
+  }
+  var sorted=deadlineData.filter(function(r){return r['Due Date'];})
+    .sort(function(a,b){return new Date(a['Due Date'])-new Date(b['Due Date']);});
+  var todayEnd=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  var weekEnd=new Date(now);weekEnd.setDate(weekEnd.getDate()+7);
+  var today=sorted.filter(function(r){return new Date(r['Due Date'])<=todayEnd;});
+  var week=sorted.filter(function(r){var d=new Date(r['Due Date']);return d>todayEnd&&d<=weekEnd;});
+  var later=sorted.filter(function(r){return new Date(r['Due Date'])>weekEnd;}).slice(0,5);
+  function rg(title,tasks,color,dot,dc){
+    if(!tasks.length)return;
+    bl.innerHTML+='<div class="st" style="color:'+color+'">'+title+'</div>';
+    tasks.forEach(function(r){
+      var ds=new Date(r['Due Date']).toLocaleDateString('en-MY',{day:'numeric',month:'short'});
+      bl.innerHTML+='<div class="dlc">'+
+        '<div class="dd '+dot+'"></div>'+
+        '<div style="flex:1">'+
+          '<div style="font-size:14px">'+r.Task+'</div>'+
+          '<div style="font-size:11px;color:var(--mt)">'+r.Assignee+'</div>'+
+        '</div>'+
+        '<div style="font-family:\'Press Start 2P\',monospace;font-size:8px;color:'+dc+'">'+ds+'</div></div>';
+    });
+  }
+  rg('DUE TODAY / OVERDUE',today,'var(--rd)','ddr','var(--rd)');
+  rg('DUE THIS WEEK',week,'var(--y)','ddy','var(--y)');
+  rg('COMING SOON',later,'#555533','ddg','#888866');
+  document.getElementById('bl').style.display='none';
+  bl.style.display='block';
+}
+
+function updateTicker(){
+  var t=0,d=0,o=0;
+  staffData.forEach(function(r){
+    t+=parseInt(r.Total)||0;
+    d+=parseInt(r.Completed)||0;
+    o+=parseInt(r.Overdue)||0;
+  });
+  document.getElementById('tkr').textContent=
+    '     LIVE DATA     &#9733;     '+t+' TOTAL TASKS     &#9733;     '+
+    d+' COMPLETED     &#9733;     '+o+' OVERDUE — CHECK THE DUNGEON     &#9733;     '+
+    'CLAIMS CUTOFF 20TH APRIL     &#9733;     WABIKONG QUEST SEASON 1 — LEVEL UP OR GO HOME     ';
+}
+
+loadData();
+setInterval(loadData,300000);
+</script>
+</body>
+</html>
