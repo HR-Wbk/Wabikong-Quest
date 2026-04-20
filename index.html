@@ -1,265 +1,512 @@
-var APP_ID = 'cli_a96b473399b8ded2';
-var APP_SECRET = 'GPfyi9bkL1vshkJFFGBwwc4coAXehjUm';
-var API = 'https://open.larksuite.com';
-var WIKI_BASE = 'Y775wc0fTiZFRNkjnsJlnyHPgHb';
-var TABLES = [
-  'tblJZqWFBfOu03QC',
-  'tblNL10ilRQ2MtvQ',
-  'tblxZxpD8LYvKJaC',
-  'tbl4fNEEtBJihk1s'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wabikong Quest</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --y:#F5C800;--yd:#C9A200;
+  --bk:#0D0D0D;--bk2:#161616;--bk3:#1E1E1E;--bk4:#252525;
+  --rd:#FF3B3B;--gr:#00C96E;--bl:#3B8BFF;--pu:#9B6FFF;
+  --wh:#FFFFFF;--wh2:#E8E8E8;--mt:#888888;--mt2:#555555;
+  --bd:#2A2A2A;
+}
+body{background:var(--bk);font-family:'Inter',sans-serif;color:var(--wh);min-height:100vh;font-size:18px}
+.pf{font-family:'Press Start 2P',monospace}
+.screen{display:none;animation:fi 0.5s ease}.screen.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes ticker{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes countbar{from{width:100%}to{width:0%}}
+
+.hdr{background:var(--y);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid var(--yd)}
+.logo{font-family:'Press Start 2P',monospace;font-size:20px;color:var(--bk);letter-spacing:2px}
+.sub{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--bk);opacity:0.55;margin-top:5px}
+.hdr-right{display:flex;align-items:center;gap:12px}
+.live{background:var(--rd);color:var(--wh);font-family:'Press Start 2P',monospace;font-size:8px;padding:6px 12px;border-radius:4px;animation:blink 1s infinite}
+.clk{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--bk);opacity:0.75}
+
+.nav{display:flex;gap:0;background:var(--bk2);border-bottom:3px solid var(--y);overflow-x:auto}
+.nb{font-family:'Press Start 2P',monospace;font-size:9px;padding:18px 22px;background:transparent;border:none;border-right:1px solid var(--bd);color:var(--mt);cursor:pointer;white-space:nowrap;transition:all 0.2s;position:relative;overflow:hidden}
+.nb:hover{color:var(--wh2);background:var(--bk3)}
+.nb.active{color:var(--bk);background:var(--y)}
+.nb.active .cbar{position:absolute;bottom:0;left:0;height:4px;background:rgba(0,0,0,0.25);animation:countbar 15s linear}
+.auto-info{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--mt);padding:0 20px;display:flex;align-items:center;margin-left:auto;gap:8px;white-space:nowrap}
+.auto-dot{width:8px;height:8px;border-radius:50%;background:var(--gr)}
+
+.tkr{background:var(--bk2);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);padding:10px 0;overflow:hidden;white-space:nowrap}
+.tki{display:inline-block;animation:ticker 35s linear infinite;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--y)}
+
+.cnt{padding:28px 32px;max-width:1400px;margin:0 auto}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+
+.card{background:var(--bk2);border:1px solid var(--bd);border-radius:12px;padding:24px}
+.card-y{border:2px solid var(--y);background:var(--bk3)}
+.card-r{border:2px solid var(--rd);background:#1a0808}
+.card-g{border:2px solid var(--gr);background:#081a0e}
+.card-b{border:2px solid var(--bl);background:#08101a}
+.card-p{border:2px solid var(--pu);background:#10081a}
+
+.ct{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mt);margin-bottom:14px;letter-spacing:1px}
+.big-num{font-family:'Press Start 2P',monospace;font-size:36px;line-height:1;margin-bottom:8px}
+.big-num-y{color:var(--y)}
+.big-num-r{color:var(--rd)}
+.big-num-g{color:var(--gr)}
+.big-num-b{color:var(--bl)}
+.card-sub{font-size:16px;color:var(--mt);margin-top:6px}
+
+.pb{background:var(--bk4);border-radius:6px;height:14px;overflow:hidden;margin:10px 0}
+.pf{height:100%;border-radius:6px;transition:width 1.2s ease}
+.fy{background:var(--y)}.fr{background:var(--rd)}.fg{background:var(--gr)}.fb{background:var(--bl)}.fp{background:var(--pu)}
+
+.st{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--y);margin:24px 0 16px;display:flex;align-items:center;gap:12px;letter-spacing:1px}
+.st::after{content:'';flex:1;height:2px;background:var(--bd)}
+
+.hc{background:var(--bk3);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin:10px 0;display:flex;align-items:center;gap:16px;transition:all 0.2s}
+.hc:hover{border-color:var(--y);transform:translateX(4px)}
+.hc.top{border:2px solid var(--y);background:#1a1600}
+
+.av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;font-size:14px;flex-shrink:0}
+.avy{background:#2a2200;color:var(--y);border:2px solid var(--y)}
+.avd{background:var(--bk4);color:var(--mt);border:2px solid var(--bd)}
+.avr{background:#2a0000;color:var(--rd);border:2px solid var(--rd)}
+.avg{background:#002a0e;color:var(--gr);border:2px solid var(--gr)}
+.avb{background:#00102a;color:var(--bl);border:2px solid var(--bl)}
+.avp{background:#10002a;color:var(--pu);border:2px solid var(--pu)}
+
+.hi{flex:1}
+.hn{font-size:20px;font-weight:700;color:var(--wh);margin-bottom:2px}
+.hcl{font-size:14px;color:var(--mt);margin-bottom:8px}
+.hs{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--y);text-align:right;min-width:100px}
+
+.bdg{display:inline-block;font-family:'Press Start 2P',monospace;font-size:7px;padding:3px 8px;border-radius:4px;margin-left:8px;vertical-align:middle}
+.by{background:#2a2200;color:var(--y);border:1px solid var(--y)}
+.br{background:#2a0000;color:var(--rd);border:1px solid var(--rd)}
+.bg2{background:#002a0e;color:var(--gr);border:1px solid var(--gr)}
+
+.dc{background:#1a0505;border:2px solid var(--rd);border-radius:12px;padding:18px 20px;margin:10px 0;transition:all 0.2s}
+.dc:hover{animation:shake 0.4s ease;border-color:#ff6666}
+.dn{font-size:20px;font-weight:700;color:var(--rd);margin-bottom:2px}
+.dt{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--rd);margin-bottom:6px;opacity:0.7;letter-spacing:1px}
+.dq{font-size:15px;color:var(--mt);font-style:italic}
+
+.dlc{background:var(--bk3);border-radius:10px;padding:16px 20px;margin:10px 0;display:flex;align-items:center;gap:16px;border:1px solid var(--bd)}
+.dd{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.ddr{background:var(--rd)}.ddy{background:var(--y)}.ddg{background:var(--mt2)}
+.dt2{font-size:17px;font-weight:600;color:var(--wh)}
+.da{font-size:14px;color:var(--mt);margin-top:2px}
+.ddate{font-family:'Press Start 2P',monospace;font-size:10px;text-align:right;white-space:nowrap}
+
+.qb{background:var(--bk3);border-left:5px solid var(--y);padding:24px 28px;border-radius:0 12px 12px 0;margin:16px 0}
+.qt{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--y);line-height:2.2}
+.qby{font-size:15px;color:var(--mt);margin-top:12px}
+
+.ls{text-align:center;padding:50px 20px}
+.lt{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--y);animation:blink 1s infinite}
+.crown{font-size:28px;animation:float 2s ease infinite;display:inline-block}
+
+.rbtn{font-family:'Press Start 2P',monospace;font-size:8px;background:var(--bk3);border:1px solid var(--yd);color:var(--y);padding:8px 14px;cursor:pointer;border-radius:6px;transition:all 0.2s}
+.rbtn:hover{background:var(--y);color:var(--bk)}
+.atbtn{font-family:'Press Start 2P',monospace;font-size:8px;padding:8px 14px;cursor:pointer;border-radius:6px;transition:all 0.2s;border:1px solid}
+.atbtn.on{background:#002a0e;border-color:var(--gr);color:var(--gr)}
+.atbtn.off{background:var(--bk3);border-color:var(--mt2);color:var(--mt)}
+
+.empty-state{text-align:center;padding:60px 20px}
+.empty-icon{font-size:48px;margin-bottom:20px}
+.empty-title{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--y);margin-bottom:12px}
+.empty-sub{font-size:17px;color:var(--mt)}
+
+@media(max-width:768px){.g2,.g4{grid-template-columns:1fr}.hdr{padding:12px 16px}.cnt{padding:16px}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="logo pf">WABIKONG QUEST</div>
+    <div class="sub pf" style="font-family:'Press Start 2P',monospace;font-size:9px;color:#1a1a1a;opacity:0.6;margin-top:5px">QUEST — SEASON 1 — APRIL 2026</div>
+  </div>
+  <div class="hdr-right">
+    <div class="clk pf" id="clk">00:00:00</div>
+    <button class="atbtn on" id="atbtn" onclick="toggleAuto()">AUTO ON</button>
+    <button class="rbtn" onclick="loadData()">&#8635; SYNC</button>
+    <div class="live pf">LIVE</div>
+  </div>
+</div>
+
+<div class="nav" id="nav">
+  <button class="nb active" id="tab-kingdom" onclick="manualSwitch('kingdom',this)">THE KINGDOM</button>
+  <button class="nb" id="tab-heroes" onclick="manualSwitch('heroes',this)">HEROES</button>
+  <button class="nb" id="tab-dungeon" onclick="manualSwitch('dungeon',this)">THE DUNGEON</button>
+  <button class="nb" id="tab-bossfight" onclick="manualSwitch('bossfight',this)">BOSS FIGHT</button>
+  <button class="nb" id="tab-wisdom" onclick="manualSwitch('wisdom',this)">WIZARD SAYS</button>
+  <div class="auto-info" id="ainfo">
+    <div class="auto-dot"></div>
+    <span>NEXT: <span id="nxtlbl">HEROES</span> IN <span id="cdlbl">15</span>s</span>
+  </div>
+</div>
+
+<div class="tkr"><span class="tki" id="tkr">     LOADING WABIKONG QUEST DATA...     </span></div>
+
+<div class="cnt">
+
+<div id="screen-kingdom" class="screen active">
+  <div id="kl" class="ls"><div class="lt">CONNECTING TO GOOGLE SHEET...</div><div style="font-size:16px;color:var(--mt);margin-top:16px">Fetching live data from your sheet</div></div>
+  <div id="kc" style="display:none">
+    <div class="g4" style="margin-bottom:24px">
+      <div class="card card-y">
+        <div class="ct">KINGDOM HEALTH</div>
+        <div class="big-num big-num-y" id="kh">0%</div>
+        <div class="pb"><div class="pf fy" id="khb" style="width:0%"></div></div>
+        <div class="card-sub">Tasks completed</div>
+      </div>
+      <div class="card card-g">
+        <div class="ct">QUESTS DONE</div>
+        <div class="big-num big-num-g" id="kd">0</div>
+        <div class="pb"><div class="pf fg" id="kdb" style="width:0%"></div></div>
+        <div class="card-sub" id="kdl">of 0 total</div>
+      </div>
+      <div class="card card-r">
+        <div class="ct">DANGER ZONE</div>
+        <div class="big-num big-num-r" id="ko">0</div>
+        <div class="card-sub">Overdue tasks</div>
+      </div>
+      <div class="card card-b">
+        <div class="ct">DAYS LEFT</div>
+        <div class="big-num big-num-b" id="kday">-</div>
+        <div class="card-sub">Until month end</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="ct">STATUS BREAKDOWN</div>
+        <div id="ksb"></div>
+      </div>
+      <div class="card">
+        <div class="ct">STAFF OVERVIEW</div>
+        <div id="kso"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-heroes" class="screen">
+  <div class="st">WALL OF FAME</div>
+  <div id="hl" class="ls"><div class="lt">SUMMONING HEROES...</div></div>
+  <div id="hlist" style="display:none"></div>
+</div>
+
+<div id="screen-dungeon" class="screen">
+  <div style="font-family:'Press Start 2P',monospace;font-size:13px;color:var(--rd);text-align:center;margin:16px 0;letter-spacing:2px">
+    &#9760;  HEROES TRAPPED BY THEIR OWN DEADLINES  &#9760;
+  </div>
+  <div id="dl" class="ls"><div class="lt">SCANNING FOR SLACKERS...</div></div>
+  <div id="dlist" style="display:none"></div>
+</div>
+
+<div id="screen-bossfight" class="screen">
+  <div style="font-family:'Press Start 2P',monospace;font-size:13px;color:var(--y);text-align:center;margin:16px 0;animation:blink 1s infinite;letter-spacing:2px">
+    &#9889;  BOSS FIGHT INCOMING — DEADLINES APPROACHING  &#9889;
+  </div>
+  <div id="bl" class="ls"><div class="lt">SCANNING DEADLINES...</div></div>
+  <div id="blist" style="display:none"></div>
+</div>
+
+<div id="screen-wisdom" class="screen">
+  <div style="font-family:'Press Start 2P',monospace;font-size:13px;color:var(--y);text-align:center;margin:20px 0;letter-spacing:2px">
+    WIZARD PUAH SPEAKS
+  </div>
+  <div class="qb">
+    <div class="qt" id="qt"></div>
+    <div class="qby">&#8212; Ancient HR Proverb</div>
+  </div>
+  <div style="text-align:center;margin-top:24px">
+    <button onclick="nq()" style="font-family:'Press Start 2P',monospace;font-size:10px;background:var(--y);border:none;color:var(--bk);padding:14px 24px;cursor:pointer;border-radius:8px;font-weight:700">NEXT WISDOM &#9658;</button>
+  </div>
+  <div class="st" style="margin-top:32px">ALL PROVERBS</div>
+  <div id="aq"></div>
+</div>
+
+</div>
+
+<script>
+var SHEET_ID='15Vd7GMhZezuqSfkSUEfTg-ckbXC1HGeXXE2-VLKHU4A';
+var API_KEY='AIzaSyDNDf8xFTGg0WVmwoCt3R3z8rR8pKyR_IA';
+var BASE='https://sheets.googleapis.com/v4/spreadsheets/';
+var staffData=[];var deadlineData=[];
+var SCREENS=['kingdom','heroes','dungeon','bossfight','wisdom'];
+var LABELS=['THE KINGDOM','HEROES','THE DUNGEON','BOSS FIGHT','WIZARD SAYS'];
+var cidx=0;var autoOn=true;var aTimer=null;var cdTimer=null;var cdVal=15;
+
+var quotes=[
+  "Your tasks won't complete themselves lah.",
+  "Deadline approaching. Panic responsibly.",
+  "The WiFi is fast. Why aren't you?",
+  "Someone is watching your overdue tasks. It is everyone.",
+  "Submit your claims or explain to payroll yourself.",
+  "Every overdue task is a boss you refused to fight.",
+  "Your future self is not happy with you right now.",
+  "Not updating the sheet is also a task. An overdue one.",
+  "The dungeon has no WiFi. Complete your tasks.",
+  "HR sees all. HR knows all. HR is HR.",
+  "Completed = hero. Overdue = dungeon. Choose wisely.",
+  "Wabikong did not come this far for you to procrastinate.",
+  "Content won't create itself. Neither will your task updates.",
+  "Your overdue tasks have their own overdue tasks now.",
+  "The camera does not lie. Neither does the Dungeon.",
+  "Even the intern is watching the leaderboard.",
+  "Behind every great YouTube channel is someone updating tasks.",
+  "Malaysian time is not an excuse in Wabikong Quest.",
+  "Bernice can see this screen. Just saying.",
+  "100k views won't hit themselves. Finish your tasks first."
 ];
+var qi=0;
+function nq(){qi=(qi+1)%quotes.length;document.getElementById('qt').textContent=quotes[qi];}
+document.getElementById('qt').textContent=quotes[0];
+var aqEl=document.getElementById('aq');
+quotes.forEach(function(q){
+  var d=document.createElement('div');
+  d.className='qb';d.style.marginBottom='12px';
+  d.innerHTML='<div class="qt" style="font-size:10px">'+q+'</div>';
+  aqEl.appendChild(d);
+});
 
-function getLarkToken() {
-  var res = UrlFetchApp.fetch(API + '/open-apis/auth/v3/tenant_access_token/internal', {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify({app_id: APP_ID, app_secret: APP_SECRET})
+function showScreen(n){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.nb').forEach(function(b){
+    b.classList.remove('active');
+    var cb=b.querySelector('.cbar');if(cb)cb.remove();
   });
-  return JSON.parse(res.getContentText()).tenant_access_token;
+  document.getElementById('screen-'+n).classList.add('active');
+  var tab=document.getElementById('tab-'+n);
+  if(tab){
+    tab.classList.add('active');
+    if(autoOn){var cb=document.createElement('div');cb.className='cbar';tab.appendChild(cb);}
+  }
+  if(n==='wisdom')nq();
+  var ni=(SCREENS.indexOf(n)+1)%SCREENS.length;
+  var nlbl=document.getElementById('nxtlbl');
+  if(nlbl)nlbl.textContent=LABELS[ni];
+  cdVal=15;
+  var cdel=document.getElementById('cdlbl');
+  if(cdel)cdel.textContent=15;
 }
 
-function searchRecords(tok, tableId) {
-  var records = [];
-  var pageToken = '';
-  do {
-    var url = API + '/open-apis/bitable/v1/apps/' + WIKI_BASE + '/tables/' + tableId + '/records/search';
-    if (pageToken) { url = url + '?page_token=' + pageToken; }
-    var res = UrlFetchApp.fetch(url, {
-      method: 'post',
-      headers: {Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json'},
-      payload: JSON.stringify({page_size: 100}),
-      muteHttpExceptions: true
+function startAuto(){
+  stopAuto();
+  if(!autoOn)return;
+  aTimer=setInterval(function(){cidx=(cidx+1)%SCREENS.length;showScreen(SCREENS[cidx]);},15000);
+  cdTimer=setInterval(function(){cdVal--;var el=document.getElementById('cdlbl');if(el)el.textContent=Math.max(0,cdVal);if(cdVal<=0)cdVal=15;},1000);
+}
+function stopAuto(){if(aTimer){clearInterval(aTimer);aTimer=null;}if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
+function toggleAuto(){
+  autoOn=!autoOn;
+  var btn=document.getElementById('atbtn');
+  var ai=document.getElementById('ainfo');
+  if(autoOn){btn.textContent='AUTO ON';btn.className='atbtn on';if(ai)ai.style.display='flex';startAuto();}
+  else{btn.textContent='AUTO OFF';btn.className='atbtn off';if(ai)ai.style.display='none';stopAuto();}
+}
+function manualSwitch(n,btn){cidx=SCREENS.indexOf(n);showScreen(n);if(autoOn){stopAuto();startAuto();}}
+
+function updateClock(){
+  var now=new Date();
+  document.getElementById('clk').textContent=
+    now.getHours().toString().padStart(2,'0')+':'+
+    now.getMinutes().toString().padStart(2,'0')+':'+
+    now.getSeconds().toString().padStart(2,'0');
+}
+setInterval(updateClock,1000);updateClock();
+
+var dl2=Math.ceil((new Date('2026-04-30')-new Date())/(1000*60*60*24));
+document.getElementById('kday').textContent=Math.max(0,dl2);
+
+function parseSheet(data){
+  if(!data.values||data.values.length<2)return[];
+  var h=data.values[0];var rows=[];
+  for(var i=1;i<data.values.length;i++){
+    var r=data.values[i];if(!r||!r[0]||!r[0].trim())continue;
+    var obj={};h.forEach(function(hh,j){obj[hh]=r[j]||'';});rows.push(obj);
+  }
+  return rows;
+}
+
+function showErr(msg){
+  ['kl','hl','dl','bl'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.innerHTML='<div class="lt" style="color:var(--rd);animation:none;font-size:11px">'+msg+'</div><div style="font-size:16px;color:var(--mt);margin-top:16px">Check Google Sheet permissions and internet connection.</div>';
+  });
+}
+
+async function fetchRange(range){
+  var url=BASE+SHEET_ID+'/values/'+encodeURIComponent(range)+'?key='+API_KEY;
+  var r=await fetch(url);if(!r.ok)throw new Error('Error '+r.status);
+  return await r.json();
+}
+
+async function loadData(){
+  try{
+    var s1=await fetchRange('Staff!A:E');
+    staffData=parseSheet(s1).filter(function(r){return r.Name&&r.Name!=='Name';});
+    try{var s2=await fetchRange('Deadlines!A:D');deadlineData=parseSheet(s2).filter(function(r){return r.Task&&r.Task!=='Task';});}
+    catch(e){deadlineData=[];}
+    if(staffData.length===0){showErr('NO STAFF DATA');return;}
+    renderKingdom();renderHeroes();renderDungeon();renderBossFight();updateTicker();
+  }catch(e){showErr('CONNECTION ERROR');console.error(e);}
+}
+
+function renderKingdom(){
+  var t=0,d=0,o=0,og=0;
+  staffData.forEach(function(r){t+=parseInt(r.Total)||0;d+=parseInt(r.Completed)||0;o+=parseInt(r.Overdue)||0;og+=parseInt(r.Ongoing)||0;});
+  var pct=t>0?Math.round(d/t*100):0;
+  document.getElementById('kh').textContent=pct+'%';
+  document.getElementById('khb').style.width=pct+'%';
+  document.getElementById('kd').textContent=d;
+  document.getElementById('kdb').style.width=(t>0?Math.round(d/t*100):0)+'%';
+  document.getElementById('kdl').textContent='of '+t+' total';
+  document.getElementById('ko').textContent=o;
+  var sb=document.getElementById('ksb');sb.innerHTML='';
+  [{l:'Completed',c:d,cl:'fg',col:'var(--gr)'},{l:'Ongoing',c:og,cl:'fb',col:'var(--bl)'},{l:'Overdue',c:o,cl:'fr',col:'var(--rd)'}].forEach(function(s){
+    var p=t>0?Math.round(s.c/t*100):0;
+    sb.innerHTML+='<div style="margin-bottom:16px">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:6px">'+
+      '<span style="font-size:16px;font-weight:600">'+s.l+'</span>'+
+      '<span style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:'+s.col+'">'+s.c+'  ('+p+'%)</span></div>'+
+      '<div class="pb"><div class="pf '+s.cl+'" style="width:'+p+'%"></div></div></div>';
+  });
+  var so=document.getElementById('kso');so.innerHTML='';
+  staffData.forEach(function(r){
+    var tot=parseInt(r.Total)||0;var don=parseInt(r.Completed)||0;
+    var p=tot>0?Math.round(don/tot*100):0;
+    so.innerHTML+='<div style="margin-bottom:16px">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:6px">'+
+      '<span style="font-size:16px;font-weight:600">'+r.Name+'</span>'+
+      '<span style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:var(--y)">'+p+'%</span></div>'+
+      '<div class="pb"><div class="pf fy" style="width:'+p+'%"></div></div></div>';
+  });
+  document.getElementById('kl').style.display='none';
+  document.getElementById('kc').style.display='block';
+}
+
+var avCols=['avy','avg','avb','avp','avd','avd','avd','avd'];
+var staffRoles={
+  'Hui Suan':    {funny:'Chief Chaos Coordinator',real:'Assistant Producer',icon:'&#127916;'},
+  'Rony':        {funny:'Viral Wizard',real:'Content Strategist',icon:'&#129497;'},
+  'Abigail Leong':{funny:'Professional Gold Digger',real:'BD Manager',icon:'&#128188;'},
+  'Sarah':       {funny:'People Whisperer',real:'Talent & Campaign Exec',icon:'&#127775;'},
+  'Zomic':       {funny:'Content Sorcerer',real:'Content Strategist',icon:'&#129497;'},
+  'Ang Jia Yi':  {funny:'Idea Machine',real:'Content Strategist',icon:'&#129497;'},
+  'Yan Shun':    {funny:'Pixel Surgeon',real:'Editor',icon:'&#9986;'},
+  'Tee Zi Yang': {funny:'Cut Master 3000',real:'Editor',icon:'&#9986;'},
+  'Daniel':      {funny:'Dungeon Apprentice',real:'Intern',icon:'&#128203;'},
+  'Kexin':       {funny:'Viral Wizard Jr.',real:'Content Strategist',icon:'&#129497;'},
+  'Sharmine':    {funny:'Coin Counter Supreme',real:'Finance',icon:'&#128176;'},
+  'Jolynn':      {funny:'Dungeon Apprentice',real:'Intern',icon:'&#128203;'},
+  'Jenn nn':     {funny:'Scissorhands',real:'Editor',icon:'&#9986;'},
+  'PEK YANG':    {funny:'Dungeon Apprentice',real:'Intern',icon:'&#128203;'},
+  'Zoe':         {funny:'Hype Machine',real:'Product Campaign Strategist',icon:'&#128293;'},
+  'Zi Tian':     {funny:"Boss's Shadow",real:'PA',icon:'&#128084;'}
+};
+var defaultRole={funny:'Quest Hero',real:'Wabikong Crew',icon:'&#11088;'};
+var classes=['Warrior','Mage','Bard','Tank','Apprentice','Ranger','Rogue','Healer'];
+var icons=['&#9876;','&#129497;','&#11088;','&#128737;','&#128423;','&#127993;','&#128303;','&#128138;'];
+var dtitles=['PROCRASTINATOR OF THE WEEK','CURRENTLY IN DENIAL','PROFESSIONALLY MISSING','TASK HOARDER SUPREME','DEADLINE? WHAT DEADLINE?'];
+var dquotes=['"Last seen attempting to look busy"','"Tasks ageing like fine wine"','"WiFi is fast. They are not."','"Buffering since last week"','"In a meeting with their own excuses"'];
+
+function renderHeroes(){
+  var sorted=staffData.slice().sort(function(a,b){return(parseInt(b.Completed)||0)-(parseInt(a.Completed)||0);});
+  var hl=document.getElementById('hlist');hl.innerHTML='';
+  sorted.forEach(function(r,i){
+    var don=parseInt(r.Completed)||0,tot=parseInt(r.Total)||0,ovr=parseInt(r.Overdue)||0;
+    var pct=tot>0?Math.round(don/tot*100):0;
+    var ini=r.Name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2);
+    var isTop=i===0;
+    var c=document.createElement('div');c.className='hc'+(isTop?' top':'');
+    c.innerHTML=(isTop?'<div class="crown">&#128081;</div>':
+      '<div style="font-family:\'Press Start 2P\',monospace;font-size:16px;color:var(--mt);min-width:36px;text-align:center">'+(i+1)+'</div>')+
+      '<div class="av '+(avCols[i%avCols.length])+'">'+ini+'</div>'+
+      '<div class="hi">'+
+        '<div class="hn">'+r.Name+(isTop?'<span class="bdg by">MVP</span>':'')+(ovr>0?'<span class="bdg br">'+ovr+' OVERDUE</span>':'')+(ovr===0&&don>0?'<span class="bdg bg2">ON TRACK</span>':'')+'</div>'+
+        '<div class="hcl">'+(staffRoles[r.Name]||defaultRole).icon+' '+(staffRoles[r.Name]||defaultRole).funny+' <span style="opacity:0.6;font-size:12px">('+( staffRoles[r.Name]||defaultRole).real+')</span></div>'+
+        '<div class="pb" style="margin:6px 0"><div class="pf fy" style="width:'+pct+'%"></div></div>'+
+      '</div>'+
+      '<div class="hs">'+don+' DONE<br><span style="font-size:11px;color:var(--mt);font-family:\'Inter\',sans-serif;font-weight:400">'+pct+'% rate</span></div>';
+    hl.appendChild(c);
+  });
+  document.getElementById('hl').style.display='none';hl.style.display='block';
+}
+
+function renderDungeon(){
+  var ov=staffData.filter(function(r){return(parseInt(r.Overdue)||0)>0;}).sort(function(a,b){return(parseInt(b.Overdue)||0)-(parseInt(a.Overdue)||0);});
+  var dl=document.getElementById('dlist');dl.innerHTML='';
+  if(ov.length===0){
+    dl.innerHTML='<div class="empty-state"><div class="empty-icon">&#127881;</div><div class="empty-title">DUNGEON IS EMPTY!</div><div class="empty-sub">All heroes are on track. The realm is safe... for now.</div></div>';
+    dl.style.display='block';document.getElementById('dl').style.display='none';return;
+  }
+  ov.forEach(function(r,i){
+    var ovr=parseInt(r.Overdue)||0;
+    var ini=r.Name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2);
+    var c=document.createElement('div');c.className='dc';
+    c.innerHTML='<div style="display:flex;align-items:center;gap:16px">'+
+      '<div class="av avr">'+ini+'</div>'+
+      '<div style="flex:1"><div class="dt">'+dtitles[i%dtitles.length]+'</div>'+
+      '<div class="dn">'+r.Name+' <span class="bdg br">'+ovr+' OVERDUE</span></div>'+
+      '<div class="dq">'+dquotes[i%dquotes.length]+'</div></div>'+
+      '<div style="text-align:right"><div style="font-family:\'Press Start 2P\',monospace;font-size:22px;color:var(--rd)">'+ovr+'</div>'+
+      '<div style="font-size:14px;color:var(--mt)">tasks</div></div></div>';
+    dl.appendChild(c);
+  });
+  document.getElementById('dl').style.display='none';dl.style.display='block';
+}
+
+function renderBossFight(){
+  var now=new Date();
+  var bl=document.getElementById('blist');bl.innerHTML='';
+  if(deadlineData.length===0){
+    bl.innerHTML='<div class="empty-state"><div class="empty-icon">&#127937;</div><div class="empty-title">NO DEADLINES SET</div><div class="empty-sub">Add deadlines to the Deadlines tab in your Google Sheet.</div><div style="font-size:14px;color:var(--mt2);margin-top:10px">Columns: Task | Assignee | Due Date | Status</div></div>';
+    bl.style.display='block';document.getElementById('bl').style.display='none';return;
+  }
+  var sorted=deadlineData.filter(function(r){return r['Due Date'];}).sort(function(a,b){return new Date(a['Due Date'])-new Date(b['Due Date']);});
+  var te=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  var we=new Date(now);we.setDate(we.getDate()+7);
+  var today=sorted.filter(function(r){return new Date(r['Due Date'])<=te;});
+  var week=sorted.filter(function(r){var d=new Date(r['Due Date']);return d>te&&d<=we;});
+  var later=sorted.filter(function(r){return new Date(r['Due Date'])>we;}).slice(0,6);
+  function rg(title,tasks,color,dot,dc){
+    if(!tasks.length)return;
+    bl.innerHTML+='<div class="st" style="color:'+color+'">'+title+'</div>';
+    tasks.forEach(function(r){
+      var ds=new Date(r['Due Date']).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'});
+      bl.innerHTML+='<div class="dlc">'+
+        '<div class="dd '+dot+'"></div>'+
+        '<div style="flex:1"><div class="dt2">'+r.Task+'</div><div class="da">'+r.Assignee+'</div></div>'+
+        '<div class="ddate" style="color:'+dc+'">'+ds+'</div></div>';
     });
-    var code = res.getResponseCode();
-    if (code !== 200) { break; }
-    var data = JSON.parse(res.getContentText());
-    if (data.data && data.data.items) {
-      records = records.concat(data.data.items);
-      pageToken = data.data.has_more ? data.data.page_token : '';
-    } else { pageToken = ''; }
-  } while (pageToken);
-  return records;
+  }
+  rg('DUE TODAY / OVERDUE',today,'var(--rd)','ddr','var(--rd)');
+  rg('DUE THIS WEEK',week,'var(--y)','ddy','var(--y)');
+  rg('COMING SOON',later,'var(--mt)','ddg','var(--mt)');
+  document.getElementById('bl').style.display='none';bl.style.display='block';
 }
 
-function readStatus(fields) {
-  var s = fields['Status'] || '';
-  if (typeof s === 'object') { s = s.text || ''; }
-  s = String(s).toLowerCase();
-  if (s.indexOf('complet') > -1) { return 'completed'; }
-  if (s.indexOf('overdue') > -1) { return 'overdue'; }
-  return 'ongoing';
+function updateTicker(){
+  var t=0,d=0,o=0;
+  staffData.forEach(function(r){t+=parseInt(r.Total)||0;d+=parseInt(r.Completed)||0;o+=parseInt(r.Overdue)||0;});
+  var s=' ★ ';
+  document.getElementById('tkr').textContent=
+    '     LIVE DATA'+s+t+' TOTAL TASKS'+s+d+' COMPLETED'+s+
+    (o>0?o+' OVERDUE — CHECK THE DUNGEON':' DUNGEON EMPTY — ALL HEROES ON TRACK')+s+
+    'AUTO ROTATING EVERY 15 SECONDS'+s+'WABIKONG QUEST SEASON 1 — LEVEL UP OR GO HOME     ';
 }
 
-function readLeader(fields) {
-  var v = fields['Task leader'] || fields['Task Leader'] || fields['Assignee'] || '';
-  if (Array.isArray(v)) {
-    var out = [];
-    var k = 0;
-    while (k < v.length) {
-      var person = v[k];
-      if (typeof person === 'object') {
-        out.push(person.name || person.display_name || person.en_name || '');
-      } else {
-        out.push(String(person));
-      }
-      k = k + 1;
-    }
-    return out.filter(function(x){return x;}).join(', ');
-  }
-  if (typeof v === 'object' && v !== null) {
-    return v.name || v.display_name || v.en_name || '';
-  }
-  return String(v);
-}
-
-function readTaskName(fields) {
-  var v = fields['Task'] || fields['task'] || fields['Task Name'] || fields['Name'] || '';
-  if (Array.isArray(v)) {
-    var out = [];
-    var k = 0;
-    while (k < v.length) {
-      if (typeof v[k] === 'object') { out.push(v[k].text || ''); }
-      else { out.push(String(v[k])); }
-      k = k + 1;
-    }
-    return out.join('');
-  }
-  if (typeof v === 'object' && v !== null) { return v.text || ''; }
-  return String(v);
-}
-
-function readDeadline(fields) {
-  var v = fields['Estimate Deadline'] || fields['End Date'] || fields['Due Date'] || fields['Deadline'] || '';
-  if (!v) { return ''; }
-  if (typeof v === 'object' && v !== null) {
-    if (v.timestamp) {
-      var d = new Date(parseInt(v.timestamp));
-      return d.toLocaleDateString('en-MY', {day:'numeric', month:'short', year:'numeric'});
-    }
-    if (v.value) { return String(v.value); }
-    return '';
-  }
-  if (typeof v === 'number') {
-    var d2 = new Date(v);
-    return d2.toLocaleDateString('en-MY', {day:'numeric', month:'short', year:'numeric'});
-  }
-  return String(v);
-}
-
-function countAllTasks(tok) {
-  var counts = {};
-  var t = 0;
-  while (t < TABLES.length) {
-    var records = searchRecords(tok, TABLES[t]);
-    Logger.log('Table ' + TABLES[t] + ': ' + records.length + ' records');
-    var r = 0;
-    while (r < records.length) {
-      var fields = records[r].fields || {};
-      var leader = readLeader(fields).trim();
-      var status = readStatus(fields);
-      if (leader && leader !== 'Unassigned') {
-        var parts = leader.split(',');
-        var n = 0;
-        while (n < parts.length) {
-          var nm = parts[n].trim();
-          if (nm) {
-            if (!counts[nm]) { counts[nm] = {completed:0,ongoing:0,overdue:0,total:0}; }
-            counts[nm][status] = counts[nm][status] + 1;
-            counts[nm].total = counts[nm].total + 1;
-          }
-          n = n + 1;
-        }
-      }
-      r = r + 1;
-    }
-    t = t + 1;
-  }
-  return counts;
-}
-
-function getOngoingTasks(tok) {
-  var tasks = [];
-  var t = 0;
-  while (t < TABLES.length) {
-    var records = searchRecords(tok, TABLES[t]);
-    var r = 0;
-    while (r < records.length) {
-      var fields = records[r].fields || {};
-      var status = readStatus(fields);
-      if (status === 'ongoing' || status === 'overdue') {
-        var taskName = readTaskName(fields).trim();
-        var leader = readLeader(fields).trim();
-        var deadline = readDeadline(fields);
-        if (taskName && leader) {
-          tasks.push({
-            task: taskName,
-            assignee: leader,
-            deadline: deadline,
-            status: status
-          });
-        }
-      }
-      r = r + 1;
-    }
-    t = t + 1;
-  }
-  tasks.sort(function(a, b) {
-    if (!a.deadline) { return 1; }
-    if (!b.deadline) { return -1; }
-    return new Date(a.deadline) - new Date(b.deadline);
-  });
-  return tasks;
-}
-
-function updateStaffSheet(counts) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Staff');
-  var sheetData = sheet.getDataRange().getValues();
-  var updated = 0;
-  var i = 1;
-  while (i < sheetData.length) {
-    var nm = String(sheetData[i][0]).trim();
-    if (nm) {
-      var c = counts[nm] || {completed:0,ongoing:0,overdue:0,total:0};
-      sheet.getRange(i+1,2).setValue(c.completed);
-      sheet.getRange(i+1,3).setValue(c.ongoing);
-      sheet.getRange(i+1,4).setValue(c.overdue);
-      sheet.getRange(i+1,5).setValue(c.total);
-      updated = updated + 1;
-    }
-    i = i + 1;
-  }
-  return updated;
-}
-
-function updateDeadlinesSheet(tasks) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Deadlines');
-  if (!sheet) {
-    sheet = ss.insertSheet('Deadlines');
-  }
-  sheet.clearContents();
-  sheet.getRange(1,1).setValue('Task');
-  sheet.getRange(1,2).setValue('Assignee');
-  sheet.getRange(1,3).setValue('Due Date');
-  sheet.getRange(1,4).setValue('Status');
-  var i = 0;
-  while (i < tasks.length) {
-    sheet.getRange(i+2,1).setValue(tasks[i].task);
-    sheet.getRange(i+2,2).setValue(tasks[i].assignee);
-    sheet.getRange(i+2,3).setValue(tasks[i].deadline);
-    sheet.getRange(i+2,4).setValue(tasks[i].status);
-    i = i + 1;
-  }
-  Logger.log('Deadlines tab updated with ' + tasks.length + ' ongoing tasks');
-}
-
-function syncToSheet() {
-  var tok = getLarkToken();
-  var counts = countAllTasks(tok);
-  var staffUpdated = updateStaffSheet(counts);
-  var tasks = getOngoingTasks(tok);
-  updateDeadlinesSheet(tasks);
-  Logger.log('Sync complete! Staff: ' + staffUpdated + ' rows. Deadlines: ' + tasks.length + ' tasks.');
-}
-
-function doGet(e) {
-  try {
-    var tok = getLarkToken();
-    var counts = countAllTasks(tok);
-    var staffUpdated = updateStaffSheet(counts);
-    var tasks = getOngoingTasks(tok);
-    updateDeadlinesSheet(tasks);
-    return ContentService.createTextOutput(JSON.stringify({
-      status: 'success',
-      message: 'Sheet updated successfully',
-      staff_updated: staffUpdated,
-      deadlines_updated: tasks.length,
-      counts: counts,
-      timestamp: new Date().toISOString()
-    })).setMimeType(ContentService.MimeType.JSON);
-  } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({
-      status: 'error',
-      message: err.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function doPost(e) {
-  return doGet(e);
-}
-
-function setTrigger() {
-  var triggers = ScriptApp.getProjectTriggers();
-  var t = 0;
-  while (t < triggers.length) {
-    ScriptApp.deleteTrigger(triggers[t]);
-    t = t + 1;
-  }
-  ScriptApp.newTrigger('syncToSheet')
-    .timeBased()
-    .everyMinutes(15)
-    .create();
-  Logger.log('Trigger set — runs every 15 mins!');
-}
+loadData();
+setInterval(loadData,300000);
+startAuto();
+</script>
+</body>
+</html>
