@@ -16,14 +16,18 @@ body{background:var(--bk);font-family:'Rajdhani',sans-serif;color:var(--wh);min-
 @keyframes ticker{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 @keyframes pulse{0%,100%{box-shadow:0 0 8px var(--y)}50%{box-shadow:0 0 20px var(--y)}}
+@keyframes progress{from{width:100%}to{width:0%}}
 .hdr{background:var(--y);border-bottom:3px solid var(--bk);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .logo{font-family:'Press Start 2P',monospace;font-size:15px;color:var(--bk);letter-spacing:1px}
 .sub{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--bk);opacity:0.6;margin-top:3px}
 .live{background:var(--bk);color:var(--y);font-family:'Press Start 2P',monospace;font-size:7px;padding:4px 8px;border-radius:2px;animation:blink 1s infinite}
 .clk{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--bk);opacity:0.7}
-.nav{display:flex;gap:4px;padding:8px 20px;background:var(--bk2);border-bottom:2px solid var(--y);overflow-x:auto}
-.nb{font-family:'Press Start 2P',monospace;font-size:7px;padding:8px 10px;background:var(--bk3);border:1px solid var(--bd);color:var(--mt);cursor:pointer;border-radius:2px;white-space:nowrap;transition:all 0.2s}
-.nb.active,.nb:hover{background:var(--y);color:var(--bk);border-color:var(--y)}
+.nav{display:flex;gap:4px;padding:8px 20px;background:var(--bk2);border-bottom:2px solid var(--y);overflow-x:auto;position:relative}
+.nb{font-family:'Press Start 2P',monospace;font-size:7px;padding:8px 10px;background:var(--bk3);border:1px solid var(--bd);color:var(--mt);cursor:pointer;border-radius:2px;white-space:nowrap;transition:all 0.2s;position:relative;overflow:hidden}
+.nb.active{background:var(--y);color:var(--bk);border-color:var(--y)}
+.nb:hover{background:var(--y);color:var(--bk);border-color:var(--y)}
+.nb.active .progress-indicator{position:absolute;bottom:0;left:0;height:3px;background:rgba(0,0,0,0.3);animation:progress 15s linear}
+.auto-label{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--mt);padding:0 10px;display:flex;align-items:center;margin-left:auto;white-space:nowrap}
 .tkr{background:var(--y);border-top:2px solid var(--bk);border-bottom:2px solid var(--bk);padding:6px 0;overflow:hidden;white-space:nowrap}
 .tki{display:inline-block;animation:ticker 30s linear infinite;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--bk)}
 .cnt{padding:16px 20px;max-width:1200px;margin:0 auto}
@@ -65,6 +69,8 @@ body{background:var(--bk);font-family:'Rajdhani',sans-serif;color:var(--wh);min-
 .crown{font-size:18px;animation:float 2s ease infinite}
 .rbtn{font-family:'Press Start 2P',monospace;font-size:7px;background:var(--bk3);border:1px solid var(--y);color:var(--y);padding:6px 10px;cursor:pointer;border-radius:2px}
 .rbtn:hover{background:var(--y);color:var(--bk)}
+.auto-toggle{font-family:'Press Start 2P',monospace;font-size:6px;background:var(--bk3);border:1px solid var(--mt);color:var(--mt);padding:6px 8px;cursor:pointer;border-radius:2px}
+.auto-toggle.on{border-color:var(--gr);color:var(--gr)}
 @media(max-width:600px){.g2,.g4{grid-template-columns:1fr}}
 </style>
 </head>
@@ -77,17 +83,19 @@ body{background:var(--bk);font-family:'Rajdhani',sans-serif;color:var(--wh);min-
   </div>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="clk" id="clk"></div>
+    <button class="auto-toggle on" id="autoBtn" onclick="toggleAuto()">AUTO ON</button>
     <button class="rbtn" onclick="loadData()">&#8635; SYNC</button>
     <div class="live">LIVE</div>
   </div>
 </div>
 
-<div class="nav">
-  <button class="nb active" onclick="showScreen('kingdom',this)">THE KINGDOM</button>
-  <button class="nb" onclick="showScreen('heroes',this)">HEROES</button>
-  <button class="nb" onclick="showScreen('dungeon',this)">THE DUNGEON</button>
-  <button class="nb" onclick="showScreen('bossfight',this)">BOSS FIGHT</button>
-  <button class="nb" onclick="showScreen('wisdom',this)">WIZARD SAYS</button>
+<div class="nav" id="nav">
+  <button class="nb active" id="tab-kingdom" onclick="manualSwitch('kingdom',this)">THE KINGDOM</button>
+  <button class="nb" id="tab-heroes" onclick="manualSwitch('heroes',this)">HEROES</button>
+  <button class="nb" id="tab-dungeon" onclick="manualSwitch('dungeon',this)">THE DUNGEON</button>
+  <button class="nb" id="tab-bossfight" onclick="manualSwitch('bossfight',this)">BOSS FIGHT</button>
+  <button class="nb" id="tab-wisdom" onclick="manualSwitch('wisdom',this)">WIZARD SAYS</button>
+  <span class="auto-label" id="auto-label">AUTO &#8594; HEROES IN <span id="countdown">15</span>s</span>
 </div>
 
 <div class="tkr"><span class="tki" id="tkr">LOADING WABIKONG QUEST DATA...</span></div>
@@ -95,10 +103,7 @@ body{background:var(--bk);font-family:'Rajdhani',sans-serif;color:var(--wh);min-
 <div class="cnt">
 
 <div id="screen-kingdom" class="screen active">
-  <div id="kl" class="ls">
-    <div class="lt">CONNECTING TO GOOGLE SHEET...</div>
-    <div style="font-size:12px;color:var(--mt);margin-top:10px">Fetching live data...</div>
-  </div>
+  <div id="kl" class="ls"><div class="lt">CONNECTING TO GOOGLE SHEET...</div><div style="font-size:12px;color:var(--mt);margin-top:10px">Fetching live data...</div></div>
   <div id="kc" style="display:none">
     <div class="g4" style="margin-bottom:12px">
       <div class="card cy"><div class="ct">KINGDOM HEALTH</div><div class="sb" id="kh">0%</div><div class="pb"><div class="pf fy" id="khb" style="width:0%"></div></div><div class="sl">Tasks completed</div></div>
@@ -150,6 +155,13 @@ var BASE='https://sheets.googleapis.com/v4/spreadsheets/';
 var staffData=[];
 var deadlineData=[];
 
+var SCREENS=['kingdom','heroes','dungeon','bossfight','wisdom'];
+var currentIdx=0;
+var autoOn=true;
+var autoTimer=null;
+var countdownTimer=null;
+var countdownVal=15;
+
 var quotes=[
   "Your tasks won't complete themselves lah.",
   "Deadline approaching. Panic responsibly.",
@@ -162,9 +174,18 @@ var quotes=[
   "The dungeon has no WiFi. Complete your tasks.",
   "HR sees all. HR knows all. HR is HR.",
   "Completed = hero. Overdue = dungeon. Choose wisely.",
-  "Wabikong did not come this far for you to procrastinate."
+  "Wabikong did not come this far for you to procrastinate.",
+  "Content won't create itself. Neither will your task updates.",
+  "Rony finished 12 tasks. What's your excuse?",
+  "Your overdue tasks have their own overdue tasks now.",
+  "The camera doesn't lie. Neither does the Dungeon.",
+  "Even the intern is watching the leaderboard.",
+  "Behind every great YouTube channel is someone updating their tasks.",
+  "Malaysian time is not an excuse in Wabikong Quest.",
+  "Bernice can see this screen. Just saying."
 ];
 var qi=0;
+
 function nq(){qi=(qi+1)%quotes.length;document.getElementById('qt').textContent=quotes[qi];}
 document.getElementById('qt').textContent=quotes[0];
 var aqEl=document.getElementById('aq');
@@ -175,11 +196,79 @@ quotes.forEach(function(q){
   aqEl.appendChild(d);
 });
 
-function showScreen(n,btn){
+function showScreen(n){
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
   document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('active');});
   document.getElementById('screen-'+n).classList.add('active');
-  if(btn)btn.classList.add('active');
+  var tab=document.getElementById('tab-'+n);
+  if(tab){
+    tab.classList.add('active');
+    var pi=tab.querySelector('.progress-indicator');
+    if(pi){pi.remove();}
+    if(autoOn){
+      var newPi=document.createElement('div');
+      newPi.className='progress-indicator';
+      tab.appendChild(newPi);
+    }
+  }
+  if(n==='wisdom'){nq();}
+  updateAutoLabel(n);
+}
+
+function updateAutoLabel(current){
+  var idx=SCREENS.indexOf(current);
+  var nextIdx=(idx+1)%SCREENS.length;
+  var nextName=SCREENS[nextIdx].replace('bossfight','BOSS FIGHT').replace('kingdom','KINGDOM').replace('heroes','HEROES').replace('dungeon','DUNGEON').replace('wisdom','WIZARD');
+  countdownVal=15;
+  document.getElementById('auto-label').style.display=autoOn?'flex':'none';
+  if(autoOn){
+    document.getElementById('auto-label').innerHTML='AUTO &#8594; '+nextName.toUpperCase()+' IN <span id="countdown">15</span>s';
+  }
+}
+
+function startAuto(){
+  stopAuto();
+  if(!autoOn)return;
+  autoTimer=setInterval(function(){
+    currentIdx=(currentIdx+1)%SCREENS.length;
+    showScreen(SCREENS[currentIdx]);
+  },15000);
+  countdownTimer=setInterval(function(){
+    countdownVal--;
+    var el=document.getElementById('countdown');
+    if(el)el.textContent=countdownVal;
+    if(countdownVal<=0)countdownVal=15;
+  },1000);
+}
+
+function stopAuto(){
+  if(autoTimer){clearInterval(autoTimer);autoTimer=null;}
+  if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null;}
+}
+
+function toggleAuto(){
+  autoOn=!autoOn;
+  var btn=document.getElementById('autoBtn');
+  if(autoOn){
+    btn.textContent='AUTO ON';
+    btn.className='auto-toggle on';
+    document.getElementById('auto-label').style.display='flex';
+    startAuto();
+  }else{
+    btn.textContent='AUTO OFF';
+    btn.className='auto-toggle';
+    document.getElementById('auto-label').style.display='none';
+    stopAuto();
+  }
+}
+
+function manualSwitch(n,btn){
+  currentIdx=SCREENS.indexOf(n);
+  showScreen(n);
+  if(autoOn){
+    stopAuto();
+    startAuto();
+  }
 }
 
 function updateClock(){
@@ -227,16 +316,11 @@ async function loadData(){
   try{
     var s1=await fetchRange('Staff!A:E');
     staffData=parseSheet(s1).filter(function(r){return r.Name&&r.Name!=='Name';});
-
     try{
       var s2=await fetchRange('Deadlines!A:D');
       deadlineData=parseSheet(s2).filter(function(r){return r.Task&&r.Task!=='Task';});
     }catch(e){deadlineData=[];}
-
-    if(staffData.length===0){
-      showError('NO STAFF DATA — ADD NAMES TO GOOGLE SHEET');
-      return;
-    }
+    if(staffData.length===0){showError('NO STAFF DATA — ADD NAMES TO GOOGLE SHEET');return;}
     renderKingdom();
     renderHeroes();
     renderDungeon();
@@ -291,7 +375,13 @@ function renderKingdom(){
 var classes=['Warrior','Mage','Bard','Tank','Apprentice','Ranger','Rogue','Healer'];
 var icons=['&#9876;','&#129497;','&#11088;','&#128737;','&#128423;','&#127993;','&#128303;','&#128138;'];
 var dtitles=['PROCRASTINATOR OF THE WEEK','CURRENTLY IN DENIAL','PROFESSIONALLY MISSING','TASK HOARDER SUPREME','DEADLINE? WHAT DEADLINE?'];
-var dquotes=['"Last seen attempting to look busy"','"Tasks ageing like fine wine"','"WiFi is fast. They are not."','"Buffering since last week"','"In a meeting with their own excuses"'];
+var dquotes=[
+  '"Last seen attempting to look busy"',
+  '"Tasks ageing like fine wine"',
+  '"WiFi is fast. They are not."',
+  '"Buffering since last week"',
+  '"In a meeting with their own excuses"'
+];
 
 function renderHeroes(){
   var sorted=staffData.slice().sort(function(a,b){return(parseInt(b.Completed)||0)-(parseInt(a.Completed)||0);});
@@ -327,9 +417,11 @@ function renderDungeon(){
   var dl=document.getElementById('dlist');
   dl.innerHTML='';
   if(ovStaff.length===0){
-    dl.innerHTML='<div style="text-align:center;padding:30px">'+
+    dl.innerHTML='<div style="text-align:center;padding:40px">'+
+      '<div style="font-family:\'Press Start 2P\',monospace;font-size:24px;color:var(--y);margin-bottom:16px">&#127881;</div>'+
       '<div style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:var(--y)">DUNGEON IS EMPTY!</div>'+
-      '<div style="font-size:14px;color:var(--mt);margin-top:10px">All heroes on track. The realm is safe.</div></div>';
+      '<div style="font-size:16px;color:var(--mt);margin-top:12px">All heroes on track.</div>'+
+      '<div style="font-size:14px;color:var(--mt);margin-top:6px">The realm is safe... for now.</div></div>';
     dl.style.display='block';
     document.getElementById('dl').style.display='none';
     return;
@@ -363,7 +455,8 @@ function renderBossFight(){
   if(deadlineData.length===0){
     bl.innerHTML='<div style="text-align:center;padding:30px">'+
       '<div style="font-family:\'Press Start 2P\',monospace;font-size:9px;color:var(--y)">NO DEADLINES FOUND</div>'+
-      '<div style="font-size:13px;color:var(--mt);margin-top:10px">Add deadlines to the Deadlines tab in Google Sheet</div></div>';
+      '<div style="font-size:13px;color:var(--mt);margin-top:10px">Add deadlines to the Deadlines tab in Google Sheet</div>'+
+      '<div style="font-size:12px;color:var(--mt);margin-top:6px">Columns: Task | Assignee | Due Date | Status</div></div>';
     bl.style.display='block';
     document.getElementById('bl').style.display='none';
     return;
@@ -403,14 +496,16 @@ function updateTicker(){
     d+=parseInt(r.Completed)||0;
     o+=parseInt(r.Overdue)||0;
   });
+  var star=' ★ ';
   document.getElementById('tkr').textContent=
-    '     LIVE DATA     &#9733;     '+t+' TOTAL TASKS     &#9733;     '+
-    d+' COMPLETED     &#9733;     '+o+' OVERDUE — CHECK THE DUNGEON     &#9733;     '+
-    'CLAIMS CUTOFF 20TH APRIL     &#9733;     WABIKONG QUEST SEASON 1 — LEVEL UP OR GO HOME     ';
+    '     LIVE DATA'+star+t+' TOTAL TASKS'+star+d+' COMPLETED'+star+
+    (o>0?o+' OVERDUE — CHECK THE DUNGEON':' DUNGEON IS EMPTY — ALL HEROES ON TRACK')+star+
+    'AUTO ROTATING EVERY 15 SECONDS'+star+'WABIKONG QUEST SEASON 1 — LEVEL UP OR GO HOME     ';
 }
 
 loadData();
 setInterval(loadData,300000);
+startAuto();
 </script>
 </body>
 </html>
