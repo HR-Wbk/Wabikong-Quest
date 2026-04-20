@@ -394,6 +394,25 @@ function renderKingdom(){
 }
 
 var avCols=['avy','avg','avb','avp','avd','avd','avd','avd'];
+var staffRoles={
+  'Hui Suan':    {funny:'Chief Chaos Coordinator',real:'Assistant Producer',icon:'&#127916;'},
+  'Rony':        {funny:'Viral Wizard',real:'Content Strategist',icon:'&#129497;'},
+  'Abigail Leong':{funny:'Professional Gold Digger',real:'BD Manager',icon:'&#128188;'},
+  'Sarah':       {funny:'People Whisperer',real:'Talent & Campaign Exec',icon:'&#127775;'},
+  'Zomic':       {funny:'Content Sorcerer',real:'Content Strategist',icon:'&#129497;'},
+  'Ang Jia Yi':  {funny:'Idea Machine',real:'Content Strategist',icon:'&#129497;'},
+  'Yan Shun':    {funny:'Pixel Surgeon',real:'Editor',icon:'&#9986;'},
+  'Tee Zi Yang': {funny:'Cut Master 3000',real:'Editor',icon:'&#9986;'},
+  'Daniel':      {funny:'Dungeon Apprentice',real:'Intern',icon:'&#128203;'},
+  'Kexin':       {funny:'Viral Wizard Jr.',real:'Content Strategist',icon:'&#129497;'},
+  'Sharmine':    {funny:'Coin Counter Supreme',real:'Finance',icon:'&#128176;'},
+  'Jolynn':      {funny:'Dungeon Apprentice',real:'Intern',icon:'&#128203;'},
+  'Jenn nn':     {funny:'Scissorhands',real:'Editor',icon:'&#9986;'},
+  'PEK YANG':    {funny:'Dungeon Apprentice',real:'Intern',icon:'&#128203;'},
+  'Zoe':         {funny:'Hype Machine',real:'Product Campaign Strategist',icon:'&#128293;'},
+  'Zi Tian':     {funny:"Boss's Shadow",real:'PA',icon:'&#128084;'}
+};
+var defaultRole={funny:'Quest Hero',real:'Wabikong Crew',icon:'&#11088;'};
 var classes=['Warrior','Mage','Bard','Tank','Apprentice','Ranger','Rogue','Healer'];
 var icons=['&#9876;','&#129497;','&#11088;','&#128737;','&#128423;','&#127993;','&#128303;','&#128138;'];
 var dtitles=['PROCRASTINATOR OF THE WEEK','CURRENTLY IN DENIAL','PROFESSIONALLY MISSING','TASK HOARDER SUPREME','DEADLINE? WHAT DEADLINE?'];
@@ -413,7 +432,7 @@ function renderHeroes(){
       '<div class="av '+(avCols[i%avCols.length])+'">'+ini+'</div>'+
       '<div class="hi">'+
         '<div class="hn">'+r.Name+(isTop?'<span class="bdg by">MVP</span>':'')+(ovr>0?'<span class="bdg br">'+ovr+' OVERDUE</span>':'')+(ovr===0&&don>0?'<span class="bdg bg2">ON TRACK</span>':'')+'</div>'+
-        '<div class="hcl">'+icons[i%icons.length]+' '+classes[i%classes.length]+'</div>'+
+        '<div class="hcl">'+(staffRoles[r.Name]||defaultRole).icon+' '+(staffRoles[r.Name]||defaultRole).funny+' <span style="opacity:0.6;font-size:12px">('+( staffRoles[r.Name]||defaultRole).real+')</span></div>'+
         '<div class="pb" style="margin:6px 0"><div class="pf fy" style="width:'+pct+'%"></div></div>'+
       '</div>'+
       '<div class="hs">'+don+' DONE<br><span style="font-size:11px;color:var(--mt);font-family:\'Inter\',sans-serif;font-weight:400">'+pct+'% rate</span></div>';
